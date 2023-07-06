@@ -1,105 +1,153 @@
-import pickle
 from flask import Flask, jsonify, request
+from pymongo import MongoClient
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
-# Load menu data from menu.pkl
-def load_menu_data():
-    try:
-        with open('menu.pkl', 'rb') as file:
-            menu_data = pickle.load(file)
-    except FileNotFoundError:
-        menu_data = {}
-    return menu_data
+# Initialize MongoDB client
+client = MongoClient('mongodb+srv://akash:shukla@cluster0.i4l3uah.mongodb.net/')
+db = client['zesty_zomato']  # MongoDB database
+menu_collection = db['menu']  # Collection for menu items
+orders_collection = db['orders']  # Collection for order details
 
-# Save menu data to menu.pkl
-def save_menu_data(menu_data):
-    with open('menu.pkl', 'wb') as file:
-        pickle.dump(menu_data, file)
 
-# Load order data from orders.pkl
-def load_order_data():
-    try:
-        with open('orders.pkl', 'rb') as file:
-            order_data = pickle.load(file)
-    except FileNotFoundError:
-        order_data = []
-    return order_data
+menu_schema = {
+    "dish_id": int,
+    'dish_name': str,
+    'dish_img':str,
+    'price': float,
+    'availability': bool
+}
 
-# Save order data to orders.pkl
-def save_order_data(order_data):
-    with open('orders.pkl', 'wb') as file:
-        pickle.dump(order_data, file)
+order_schema = {
+    'customer_name': str,
+    'dishes': [{
+        'dish_id': int,
+        'quantity': int
+    }],
+    'status': str
+}
 
-# Route to get all dishes from the menu
+
 @app.route('/menu', methods=['GET'])
 def get_menu():
-    menu_data = load_menu_data()
-    return jsonify(menu_data)
+    menu_data = menu_collection.find({}, {'_id': 0})
+    return jsonify(list(menu_data))
 
-# Route to add a dish to the menu
 @app.route('/menu', methods=['POST'])
 def add_dish():
     dish = request.json
-    menu_data = load_menu_data()
-    dish_id = str(len(menu_data) + 1)
-    menu_data[dish_id] = dish
-    save_menu_data(menu_data)
+    menu_collection.insert_one(dish)
     return jsonify({'message': 'Dish added successfully'})
 
-# Route to edit the availability of a dish
 @app.route('/menu/<dish_id>', methods=['PUT'])
 def update_availability(dish_id):
     dish = request.json
-    menu_data = load_menu_data()
-    if dish_id in menu_data:
-        menu_data[dish_id]['availability'] = dish['availability']
-        save_menu_data(menu_data)
-        return jsonify({'message': 'Availability updated successfully'})
-    else:
-        return jsonify({'error': 'Dish not found'})
+    menu_collection.update_one({'dish_id': dish_id}, {'$set': dish})
+    return jsonify({'message': 'Availability updated successfully'})
 
-# Route to delete a dish from the menu
 @app.route('/menu/<dish_id>', methods=['DELETE'])
 def delete_dish(dish_id):
-    menu_data = load_menu_data()
-    if dish_id in menu_data:
-        del menu_data[dish_id]
-        save_menu_data(menu_data)
-        return jsonify({'message': 'Dish deleted successfully'})
-    else:
-        return jsonify({'error': 'Dish not found'})
+    menu_collection.delete_one({'dish_id': dish_id})
+    return jsonify({'message': 'Dish deleted successfully'})
 
-# Route to place an order
 @app.route('/order', methods=['POST'])
 def place_order():
     order = request.json
-    order_data = load_order_data()
-    order_data.append(order)
-    save_order_data(order_data)
+    populated_order = []
+
+    for item in order['dishes']:
+        dish_id = item['dish_id']
+        dish = menu_collection.find_one({'dish_id': dish_id}, {'_id': 0, 'dish_name': 1})
+        item['dish_name'] = dish['dish_name']
+        populated_order.append(item)
+
+    order['dishes'] = populated_order
+    orders_collection.insert_one(order)
     return jsonify({'message': 'Order placed successfully'})
 
-# Route to change the status of an order
 @app.route('/order/<customer_name>/status', methods=['PUT'])
 def change_order_status(customer_name):
     status = request.json['status']
-    order_data = load_order_data()
-    for order in order_data:
-        if order['customer_name'] == customer_name:
-            order['status'] = status
-            save_order_data(order_data)
-            return jsonify({'message': 'Order status updated successfully'})
-    return jsonify({'error': 'Order not found'})
+    orders_collection.update_one({'customer_name': customer_name}, {'$set': {'status': status}})
+    return jsonify({'message': 'Order status updated successfully'})
 
-# Route to retrieve order details by customer name
 @app.route('/order/<customer_name>', methods=['GET'])
 def get_order_details(customer_name):
-    order_data = load_order_data()
-    order_details = []
+    order_data = orders_collection.find({'customer_name': customer_name}, {'_id': 0})
+    populated_order_data = []
+
     for order in order_data:
-        if order['customer_name'] == customer_name:
-            order_details.append(order)
-    return jsonify(order_details)
+        populated_order = []
+
+        for item in order['dishes']:
+            dish_id = item['dish_id']
+            dish = menu_collection.find_one({'dish_id': dish_id}, {'_id': 0, 'dish_name': 1})
+            item['dish_name'] = dish['dish_name']
+            populated_order.append(item)
+
+        order['dishes'] = populated_order
+        populated_order_data.append(order)
+
+    return jsonify(populated_order_data)
+
+
+@app.route('/orders', methods=['GET'])
+def get_all_orders():
+    order_data = orders_collection.find({}, {'_id': 0})
+
+    all_orders = []
+    for order in order_data:
+        customer_name = order['customer_name']
+        dishes = []
+        total_amount = 0
+
+        for dish in order['dishes']:
+            dish_id = dish['dish_id']
+            dish_quantity = dish['quantity']
+            dish_details = menu_collection.find_one({'dish_id': dish_id}, {'_id': 0, 'dish_name': 1, 'price': 1})
+            dish_name = dish_details['dish_name']
+            dish_price = dish_details['price']
+            dish_amount = dish_quantity * dish_price
+            total_amount += dish_amount
+
+            dish_info = {
+                'dish_name': dish_name,
+                'quantity': dish_quantity,
+                'amount': dish_amount
+            }
+            dishes.append(dish_info)
+
+        order_info = {
+            'customer_name': customer_name,
+            'dishes': dishes,
+            'total_amount': total_amount
+        }
+        all_orders.append(order_info)
+
+    return jsonify(all_orders)
+
 
 if __name__ == '__main__':
     app.run()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

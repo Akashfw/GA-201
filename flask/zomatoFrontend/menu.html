@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Menu Page</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <nav>
+    <!-- Navbar code here -->
+  </nav>
+
+  <div class="container">
+    <div class="forms">
+        <h2>Add Dish</h2>
+        <form id="add-menu-form">
+          <label for="dish_id">Dish ID:</label>
+          <input type="number" id="dish_id" name="dish_id" required>
+          
+          <label for="dish-name">Dish Name:</label>
+          <input type="text" id="dish-name" name="dish-name" required>
+      
+          <label for="dish-image-url">Dish Image URL:</label>
+          <input type="text" id="dish-image-url" name="dish-image-url" required>
+      
+          <label for="dish-price">Price:</label>
+          <input type="number" id="dish-price" name="dish-price" min="0" step="0.01" required>
+      
+          <label for="dish-availability">Availability:</label>
+          <select id="dish-availability" name="dish-availability" required>
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+          </select>
+      
+          <button type="submit">Add</button>
+        </form>
+      
+        <h2>Update Dish</h2>
+        <form id="update-menu-form">
+          <label for="update-dish-name">Dish Name:</label>
+          <input type="text" id="update-dish-name" name="update-dish-name" required>
+      
+          <label for="update-dish-image-url">Dish Image URL:</label>
+          <input type="text" id="update-dish-image-url" name="update-dish-image-url" required>
+      
+          <label for="update-dish-price">Price:</label>
+          <input type="number" id="update-dish-price" name="update-dish-price" min="0" step="0.01" required>
+      
+          <label for="update-dish-availability">Availability:</label>
+          <select id="update-dish-availability" name="update-dish-availability" required>
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+          </select>
+      
+          <button type="submit">Update</button>
+        </form>
+      </div>
+      
+
+    <div class="menu-display">
+      <h2>Menu</h2>
+      <div id="menu-items">
+        <!-- Menu items will be dynamically displayed here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

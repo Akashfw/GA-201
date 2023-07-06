@@ -1,0 +1,112 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+  }
+  
+  .forms {
+    flex: 30%;
+    margin-right: 20px;
+  }
+  
+  .menu-display {
+    flex: 70%;
+  }
+  
+  .forms h2 {
+    margin-bottom: 10px;
+  }
+  
+  .forms form {
+    margin-bottom: 20px;
+  }
+  
+  .forms form input,
+  .forms form select,
+  .forms form button {
+    display: block;
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 5px;
+  }
+  
+  .forms form button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .menu-display h2 {
+    margin-bottom: 10px;
+  }
+  
+  .menu-display #menu-items {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+  }
+  
+  .menu-display .menu-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    background-color: #f8f8f8;
+  }
+  
+  .menu-display .menu-item h3 {
+    margin-top: 0;
+  }
+  
+  .menu-display .menu-item p {
+    margin-bottom: 5px;
+  }
+  
+  .forms form label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .forms form input,
+  .forms form select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .forms form button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .forms form button:hover {
+    background-color: #45a049;
+  }
+  .menu-display #menu-items {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 20px;
+  }
+  
+  .menu-display .menu-item {
+    border: 1px solid #ddd;
+    padding: 20px;
+    background-color: #f8f8f8;
+  }
+  
+  .menu-display .menu-item h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  
+  .menu-display .menu-item p {
+    margin-bottom: 5px;
+  }
+  
+  
