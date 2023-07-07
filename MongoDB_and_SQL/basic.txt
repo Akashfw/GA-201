@@ -1,0 +1,164 @@
+1) Create a Customers table / collection with the following fields: id (unique identifier), name, email, address, and phone_number.
+
+Ans =>  db.createCollection("customers")     //mongoDB
+
+CREATE TABLE customers (                     // SQL
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(255) NOT NULL,
+email VARCHAR(255) NOT NULL,
+address VARCHAR(255) NOT NULL,
+phone VARCHAR(20) NOT NULL
+);
+
+
+2)  Insert five rows / documents into the Customers table / collection with data of your choice.
+
+ans => MongoDB :-
+
+ db.customers.insertMany([
+  { name: "John Doe", email: "john@example.com", address: "123 Main St", phone: "555-1234" },
+  { name: "Jane Smith", email: "jane@example.com", address: "456 Elm St", phone: "555-5678" },
+  { name: "Michael Johnson", email: "michael@example.com", address: "789 Oak St", phone: "555-9012" },    
+  { name: "Emily Brown", email: "emily@example.com", address: "321 Pine St", phone: "555-3456" },
+  { name: "David Wilson", email: "david@example.com", address: "654 Maple St", phone: "555-7890" }
+])
+
+     SQL :- 
+
+     INSERT INTO customers (name, email, address, phone)
+VALUES
+  ('John Doe', 'john@example.com', '123 Main St', '555-1234'),
+  ('Jane Smith', 'jane@example.com', '456 Elm St', '555-5678'),
+  ('Michael Johnson', 'michael@example.com', '789 Oak St', '555-9012'),
+  ('Emily Brown', 'emily@example.com', '321 Pine St', '555-3456'),
+  ('David Wilson', 'david@example.com', '654 Maple St', '555-7890');
+
+
+
+  3) Write a query to select only the name and email fields for all customers.
+
+  ans => mongodb :- db.customers.find({}, { name: 1, email: 1, _id: 0 })
+         SQL :-   SELECT name, email
+                  FROM customers;
+
+
+
+4) Write a query to fetch all data from the Customers table / collection.
+
+Ans => mongodb :- db.customers.find({})
+       sql     :- SELECT * FROM customers;
+
+
+5) Write a query to fetch the customer with the id of 3.
+
+Ans => mongoDB :- db.customers.findOne({ id: 3 })
+       sql     :- SELECT * FROM customers WHERE id = 3;
+
+
+6) Write a query to fetch all customers whose name starts with 'A'.
+ 
+Ans => mongoDB :- db.customers.find({ name: /^A/ }
+       sql     :- SELECT *
+                  FROM customers
+                  WHERE name LIKE 'A%';
+
+
+
+7)  Write a query to fetch all customers, ordered by name in descending order.
+
+Ans => mongoDB :- db.customers.find().sort({ name: -1 })
+       sql     :- SELECT *
+                  FROM customers
+                  ORDER BY name DESC;
+
+
+
+
+8) Write a query to update the address of the customer with id 4.
+
+Ans => mongoDB :- db.customers.updateOne({ id: 4 }, { $set: { address: "New Address" } })
+       sql     :- UPDATE customers
+                  SET address = 'New Address'
+                  WHERE id = 4;
+
+
+
+
+9) Write a query to fetch the top 3 customers when ordered by id in ascending order.
+
+Ans => mongoDB :- db.customers.find().sort({ id: 1 }).limit(3)
+       sql     :- SELECT * FROM customers
+                  ORDER BY id ASC
+                  LIMIT 3;
+
+
+
+
+10) Write a query to delete the customer with id 2.
+
+Ans => mongoDB :- db.customers.deleteOne({ id: 2 })
+       sql     :- DELETE FROM customers
+                  WHERE id = 2;
+
+
+
+11) Write a query to count the number of customers.
+
+Ans => mongoDB :- db.customers.countDocuments()
+       sql     :- SELECT COUNT(*) AS customer_count
+                  FROM customers;
+
+
+
+12) Write a query to fetch all customers except the first two when ordered by id in ascending order.
+
+Ans => mongoDB :- db.customers.find().sort({ id: 1 }).skip(2)
+       sql     :- SELECT *
+                  FROM customers
+                  ORDER BY id ASC
+                  OFFSET 2;
+
+
+
+13) Write a query to fetch all customers whose id is greater than 2 and name starts with 'B'.
+
+Ans => mongoDB :- db.customers.find({ id: { $gt: 2 }, name: /^B/ })
+       sql     :- SELECT *
+                  FROM customers
+                  WHERE id > 2 AND name LIKE 'B%';
+
+
+
+
+14) Write a query to fetch all customers whose id is less than 3 or name ends with 's'.
+
+Ans => mongoDB :- db.customers.find({ $or: [ { id: { $lt: 3 } }, { name: /s$/ } ] })
+       sql     :- SELECT *
+                  FROM customers
+                  WHERE id < 3 OR name LIKE '%s';
+
+
+
+
+15) Write a query to fetch all customers where the phone_number field is not set or is null.
+
+Ans => mongoDB :- db.customers.find({ $or: [{ phone_number: { $exists: false } }, { phone_number: null }] })
+       sql     :- SELECT *
+                  FROM customers
+                  WHERE phone_number IS NULL OR phone_number = '';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
