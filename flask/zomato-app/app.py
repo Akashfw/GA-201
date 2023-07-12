@@ -1,15 +1,18 @@
 from flask import Flask, jsonify, request
 from pymongo import MongoClient
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
+# Load environment variables from the .env file
+load_dotenv()
 
+# Initialize Flask app and MongoDB client
 app = Flask(__name__)
 CORS(app)
-
-# Initialize MongoDB client
-client = MongoClient('mongodb+srv://akash:shukla@cluster0.i4l3uah.mongodb.net/')
-db = client['zesty_zomato']  # MongoDB database
-menu_collection = db['menu']  # Collection for menu items
-orders_collection = db['orders']  # Collection for order details
+client = MongoClient(os.getenv('MONGODB_URI'))
+db = client['zesty_zomato']
+menu_collection = db['menu']
+orders_collection = db['orders']
 
 
 menu_schema = {
