@@ -37,7 +37,7 @@ def test_orders_collection_structure():
 
 def test_add_dish():
     dish = {
-        'dish_id': 1,
+        'dish_id': 10,
         'dish_name': 'Pizza',
         'dish_img': 'pizza.jpg',
         'price': 10.99,
@@ -99,34 +99,6 @@ def test_change_order_status():
     # Verify that the order status is updated in the orders collection
     order_data = orders_collection.find_one({'customer_name': 'John Doe'})
     assert order_data['status'] == 'in progress'
-
-
-# 5. Order Updates
-
-def test_order_status_update():
-    # Add a sample order to the orders collection
-    order = {
-        'customer_name': 'John Doe',
-        'dishes': [
-            {'dish_id': 1, 'quantity': 2},
-            {'dish_id': 2, 'quantity': 1}
-        ],
-        'status': 'received'
-    }
-    orders_collection.insert_one(order)
-
-    # Simulate the order status update
-    updated_status = {'status': 'in progress'}
-    response = app.test_client().put('/order/John Doe/status', json=updated_status)
-    assert response.status_code == 200
-    assert response.json == {'message': 'Order status updated successfully'}
-
-    # Verify that the order status is updated in the orders collection
-    order_data = orders_collection.find_one({'customer_name': 'John Doe'})
-    assert order_data['status'] == 'in progress'
-
-    # Clean up by deleting the added order
-    orders_collection.delete_one({'customer_name': 'John Doe'})
 
 
 # invalid input

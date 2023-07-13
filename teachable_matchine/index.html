@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #f1f1f1;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #1cbbf4;
+            margin: 10px 0;
+        }
+
+        .button {
+            background-color: #1cbbf4;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #webcam-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            border: 2px solid #333333;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #FFFFFF;
+            width: 600px; /* Adjust the width as desired */
+            height: 450px; /* Adjust the height as desired */
+        }
+
+        #webcam-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        #results-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .result-box {
+            margin: 10px;
+            padding: 10px;
+            border: 2px solid #333333;
+            border-radius: 10px;
+            background-color: #1cbbf4;
+            color: white;
+        }
+
+        .result-label {
+            color: white;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Teachable Machine Image Model</h1>
+    <button class="button" onclick="toggleWebcam()">Start/Stop</button>
+    <div id="webcam-container">
+        <video id="webcam-video" autoplay playsinline></video>
+    </div>
+    <div id="results-container"></div>
+</div>
+<script src="model-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+<script type="text/javascript">
+    // More API functions here:
+    // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+
+    // the link to your model provided by Teachable Machine export panel
+    const URL = MODEL_URL;
+
+    let model, webcam, resultsContainer, maxPredictions;
+
+    async function toggleWebcam() {
+        if (!webcam) {
+            await startWebcam();
+        } else {
+            stopWebcam();
+        }
+    }
+
+    async function startWebcam() {
+        document.getElementById("webcam-container").style.display = "flex";
+        document.getElementById("results-container").innerHTML = "";
+
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+
+        try {
+            model = await tmImage.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
+
+            const constraints = { audio: false, video: true };
+            const videoElement = document.getElementById("webcam-video");
+
+            webcam = await navigator.mediaDevices.getUserMedia(constraints);
+            videoElement.srcObject = webcam;
+            await videoElement.play();
+
+            window.requestAnimationFrame(loop);
+
+            resultsContainer = document.getElementById("results-container");
+            for (let i = 0; i < maxPredictions; i++) {
+                const resultBox = document.createElement("div");
+                resultBox.classList.add("result-box");
+                resultsContainer.appendChild(resultBox);
+
+                const resultLabel = document.createElement("div");
+                resultLabel.classList.add("result-label");
+                resultBox.appendChild(resultLabel);
+            }
+        } catch (error) {
+            console.error("Error starting the webcam:", error);
+        }
+    }
+
+    function stopWebcam() {
+        document.getElementById("webcam-container").style.display = "none";
+
+        const videoElement = document.getElementById("webcam-video");
+        const stream = videoElement.srcObject;
+        const tracks = stream.getTracks();
+
+        tracks.forEach((track) => track.stop());
+
+        webcam = null;
+        resultsContainer.innerHTML = "";
+    }
+
+    async function loop() {
+        await predict();
+        window.requestAnimationFrame(loop);
+    }
+
+    async function predict() {
+        const prediction = await model.predict(document.getElementById("webcam-video"));
+        for (let i = 0; i < maxPredictions; i++) {
+            const classPrediction =
+                prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+            const resultLabel = resultsContainer.children[i].querySelector(".result-label");
+            resultLabel.innerHTML = classPrediction;
+        }
+    }
+</script>
+</body>
+</html>

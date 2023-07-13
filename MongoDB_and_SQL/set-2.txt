@@ -1,0 +1,113 @@
+mongoDb queries-
+
+16) Create a Restaurants table / collection with the fields defined above.
+ans- db.createCollection("Restaurants", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "cuisine_type", "location", "average_rating", "delivery_available"],
+      properties: {
+        _id: {
+          bsonType: "objectId"
+        },
+        name: {
+          bsonType: "string"
+        },
+        cuisine_type: {
+          bsonType: "string"
+        },
+        location: {
+          bsonType: "string"
+        },
+        average_rating: {
+          bsonType: "number"
+        },
+        delivery_available: {
+          bsonType: "bool"
+        }
+      }
+    }
+  }
+})
+
+
+17) Insert five rows / documents into the Restaurants table / collection with data of your choice.
+ans - db.Restaurants.insertMany([
+  {
+    name: "Italiano's Pizza",
+    cuisine_type: "Italian",
+    location: "123 Main Street",
+    average_rating: 4.5,
+    delivery_available: true
+  },
+  {
+    name: "Taste of India",
+    cuisine_type: "Indian",
+    location: "456 Elm Avenue",
+    average_rating: 4.2,
+    delivery_available: true
+  },
+  {
+    name: "Sushi Express",
+    cuisine_type: "Japanese",
+    location: "789 Oak Road",
+    average_rating: 4.8,
+    delivery_available: false
+  },
+  {
+    name: "La Brasserie",
+    cuisine_type: "French",
+    location: "321 Maple Lane",
+    average_rating: 4.7,
+    delivery_available: true
+  },
+  {
+    name: "Mexi Grill",
+    cuisine_type: "Mexican",
+    location: "555 Pine Street",
+    average_rating: 4.3,
+    delivery_available: true
+  }
+])
+
+
+18) Write a query to fetch all restaurants, ordered by average_rating in descending order.
+ans - db.Restaurants.find().sort({ average_rating: -1 })
+
+
+19) Write a query to fetch all restaurants that offer delivery_available and have an average_rating of more than 4.
+ans - db.Restaurants.find({
+  delivery_available: true,
+  average_rating: { $gt: 4 }
+})
+
+
+20) Write a query to fetch all restaurants where the cuisine_type field is not set or is null.
+ans - db.Restaurants.find({
+  $or: [
+    { cuisine_type: { $exists: false } },
+    { cuisine_type: null }
+  ]
+})
+
+
+21) Write a query to count the number of restaurants that have delivery_available.
+ans - db.Restaurants.countDocuments({ delivery_available: true })
+
+
+22) Write a query to fetch all restaurants whose location contains 'New York'.
+ans - db.Restaurants.find({ location: { $regex: 'New York', $options: 'i' } })
+
+
+23) Write a query to calculate the average average_rating of all restaurants.
+ans - db.Restaurants.aggregate([
+  { $group: { _id: null, avgRating: { $avg: "$average_rating" } } }
+])
+
+
+24) Write a query to fetch the top 5 restaurants when ordered by average_rating in descending order.
+ans - db.Restaurants.find().sort({ average_rating: -1 }).limit(5)
+
+
+25) Write a query to delete the restaurant with id 3.
+ans - db.Restaurants.deleteOne({ _id: ObjectId("3") })
