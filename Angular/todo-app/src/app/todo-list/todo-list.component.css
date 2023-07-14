@@ -1,0 +1,22 @@
+.todo-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .form-container {
+    width: 30%;
+  }
+  
+  .card-container {
+    flex: 1;
+    margin-left: 20px;
+  }
+  
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-gap: 20px;
+  }
+  
+  

@@ -1,0 +1,13 @@
+<div class="todo-container">
+    <div class="form-container">
+      <h2>Add/Edit Todo</h2>
+      <app-todo-form (addTodo)="addTodoItem($event)" (editTodo)="editTodoItem($event)"></app-todo-form>
+    </div>
+    <div class="card-container">
+      <h2>Todo List</h2>
+      <div class="cards">
+        <app-todo-item *ngFor="let todo of todos" [todo]="todo" (editTodo)="editTodoItem($event)" (deleteTodo)="deleteTodoItem($event)"></app-todo-item>
+      </div>
+    </div>
+  </div>
+  
